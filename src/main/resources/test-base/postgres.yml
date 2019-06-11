@@ -1,0 +1,14 @@
+version: '2'
+services:
+    postgres:
+        container_name: pgdb
+        image: postgres:9.6
+        ports:
+            - "5432:5432"
+        environment:
+            - POSTGRES_USER=user
+            - POSTGRES_PASSWORD=password
+            - POSTGRES_DB=testrest
+
+# docker-compose -f postgres.yml up -d
+# docker-compose -f postgres.yml down

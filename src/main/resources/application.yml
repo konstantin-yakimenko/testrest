@@ -1,0 +1,37 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/testresst
+    username: user
+    password: password
+    tomcat:
+      max-wait: 20000
+      max-active: 50
+      max-idle: 20
+      min-idle: 15
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          filter:
+            CommonsRequestLoggingFilter: DEBUG
+    com:
+      testres:
+        testrest:
+          util:
+            NumRequestLoggingFilter: DEBUG
+  pattern:
+    console: "{%X{requestId}} | %d{yyyy-MM-dd HH:mm:ss.SSS} | %-5level | %msg - %logger{36} [%M:%L] %n"
+
+jwt:
+  token:
+    secret-key: supersecret
+    expire-length: 600000

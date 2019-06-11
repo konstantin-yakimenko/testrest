@@ -1,0 +1,27 @@
+version: '2'
+services:
+  application:
+    image: testrest:latest
+    ports:
+      - "8081:8081"
+    networks:
+      - mynet
+
+  postgres:
+    container_name: pgdb
+    image: postgres:9.6
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=testrest
+    networks:
+      - mynet
+
+networks:
+  mynet:
+    driver: bridge
+
+# docker-compose -f ld-compose.yml up -d
+# docker-compose -f ld-compose.yml down
