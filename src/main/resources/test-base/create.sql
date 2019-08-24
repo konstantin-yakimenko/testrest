@@ -73,6 +73,16 @@ $$ language 'plpgsql'
 ;
 CREATE TRIGGER update_interest_date BEFORE UPDATE ON interest FOR EACH ROW EXECUTE PROCEDURE  update_interest_update_date();
 
+CREATE TABLE interest.users
+(
+    user_id     bigserial primary key,
+    username    varchar(100) not null,
+    password    varchar(250) not null
+);
+
+
+select username, password from users where username = 'user';
+select * from users;
 insert into city(title)
 values ('Moscow'), ('New-York'), ('London');
 insert into country(title)

@@ -3,6 +3,7 @@ package com.testres.testrest.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.testres.testrest.exception.NotFoundException;
@@ -36,8 +37,9 @@ public class PersonService implements IPersonService {
 
     @Override
     @Transactional
-    public Person save(Person person) {
+    public Person save(Person person, UserDetails userDetails) {
         log.info("save person: {}", person);
+        log.info("---- > user: {}", userDetails);
         try {
             PersonEntity personEntity = new PersonEntity(person);
             personRepository.save(personEntity);

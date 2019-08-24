@@ -1,15 +1,16 @@
 package com.testres.testrest.repository.jdbc;
 
+import com.testres.testrest.repository.IUserRepository;
+import com.testres.testrest.util.ZonedDateTimeConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import com.testres.testrest.repository.IUserRepository;
-import com.testres.testrest.util.ZonedDateTimeConverter;
 
 import javax.validation.constraints.NotNull;
 
@@ -34,6 +35,12 @@ public class UserRepository implements IUserRepository {
     @Override
     @Transactional
     public UserDetails save(@NotNull UserDetails user) {
+        String sql =
+                "insert into interest.users(username, password) values(:username, :password)";
+        MapSqlParameterSource params  = new MapSqlParameterSource()
+                .addValue("username", user.getUsername())
+                .addValue("password", user.getPassword());
+        npjt.update(sql, params);
         return user;
     }
 
@@ -46,32 +53,44 @@ public class UserRepository implements IUserRepository {
     @Override
     @Transactional(readOnly = true)
     public UserDetails findById(Long id) {
-        if (id == 1L) {
-            return User.withUsername("admin").password("{noop}adminpass").roles("USER", "ADMIN").build();
-        } else if (id == 2L) {
-            return User.withUsername("user").password("{noop}userpass").roles("USER").build();
-        }
-        throw new IllegalArgumentException("Not found user");
+        log.info("--------------findById");
+        return npjt.queryForObject("select username, password from interest.users where user_id = :user_id",
+                new MapSqlParameterSource().addValue("user_id", id),
+                (rs, rowNum) -> {
+                    return User
+                            .withUsername(rs.getString("username"))
+                            .password(rs.getString("password"))
+                            .roles("USER", "ADMIN")
+                            .build();
+                });
     }
 
     @Override
     @Transactional(readOnly = true)
     public Boolean existsByUsername(@NotNull String username) {
-        if (username.equals("admin") || username.equals("user")) {
-            return true;
-        }
-        return false;
+        log.info("--------------existsByUsername");
+        UserDetails userDetails = npjt.queryForObject("select username, password from interest.users where username = :username",
+                new MapSqlParameterSource().addValue("username", username),
+                (rs, rowNum) -> {
+                    return User
+                            .withUsername(rs.getString("username"))
+                            .password(rs.getString("password"))
+                            .roles("USER", "ADMIN")
+                            .build();
+                });
+        return userDetails != null;
     }
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails findByUsername(@NotNull String username) {
-        if (username.equals("admin")) {
-            return User.withUsername("admin").password("{noop}adminpass").roles("USER", "ADMIN").build();
-        } else if (username.equals("user")) {
-            return User.withUsername("user").password("{noop}userpass").roles("USER").build();
-        }
-        throw new IllegalArgumentException("Not found user");
+        return npjt.queryForObject("select username, password from interest.users where username = :username",
+                new MapSqlParameterSource().addValue("username", username),
+                (rs, rowNum) -> User
+                        .withUsername(rs.getString("username"))
+                        .password(rs.getString("password"))
+                        .roles("USER", "ADMIN")
+                        .build());
     }
 
     @Override

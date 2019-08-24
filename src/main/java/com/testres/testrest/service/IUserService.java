@@ -10,5 +10,7 @@ public interface IUserService {
     AuthenticationResponse signin(AuthenticationRequest data);
 
     UserInfo currentUser(UserDetails userDetails);
+
+    void create();
 }
 

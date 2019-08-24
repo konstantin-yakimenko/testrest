@@ -1,5 +1,7 @@
 package com.testres.testrest.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import com.testres.testrest.exception.NotFoundException;
 import com.testres.testrest.model.Person;
@@ -20,8 +22,10 @@ public class PersonController {
     }
 
     @PostMapping
-    public Person save(@RequestBody Person person) {
-        return personService.save(person);
+    public Person save(
+            @RequestBody Person person,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return personService.save(person, userDetails);
     }
 
     @GetMapping("/{id}")
