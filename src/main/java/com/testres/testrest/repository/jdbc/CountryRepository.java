@@ -100,4 +100,13 @@ public class CountryRepository implements ICountryRepository {
                 (rs, rowNum) -> new Country(rs.getLong("country_id"), rs.getString("title")));
         return new PageImpl<>(list, pageable, list.size());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Country getCountry(Long id) {
+        log.info("getCountry from base {}", id);
+        return npjt.queryForObject("select country_id, title from interest.country where country_id = :id"
+        , new MapSqlParameterSource().addValue("id", id),
+                (rs, rowNum) -> new Country(rs.getLong("country_id"), rs.getString("title") ));
+    }
 }

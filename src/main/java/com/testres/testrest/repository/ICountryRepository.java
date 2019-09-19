@@ -20,4 +20,6 @@ public interface ICountryRepository {
     Country findById(Long id);
 
     Page<Country> findBySearchTerm(String searchTerm, Pageable pageable);
+
+    Country getCountry(Long id);
 }
