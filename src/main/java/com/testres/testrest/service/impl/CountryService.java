@@ -9,7 +9,10 @@ import com.testres.testrest.service.ICountryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -19,18 +22,21 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class CountryService implements ICountryService {
 
-    private final ICountryRepository countryRepository;
-    private final LoadingCache<Long, Country> cache;
+    private final LoadingCache<Long, Map<Long, Country>> cache;
 
 
     @Autowired
     public CountryService(ICountryRepository countryRepository) {
-        this.countryRepository = countryRepository;
 
-        CacheLoader<Long, Country> loader = new CacheLoader<Long, Country>() {
+        CacheLoader<Long, Map<Long, Country>> loader = new CacheLoader<Long, Map<Long, Country>>() {
             @Override
-            public Country load(Long key) {
-                return countryRepository.getCountry(key);
+            public Map<Long, Country> load(Long key) {
+                Map<Long, Country> cache = new ConcurrentHashMap<>();
+                List<Country> countries = countryRepository.findAll();
+                for (Country country : countries) {
+                    cache.put(country.getCountryId(), country);
+                }
+                return cache;
             }
         };
         cache = CacheBuilder
@@ -41,13 +47,18 @@ public class CountryService implements ICountryService {
 
     @Override
     public List<Country> getAllCountries() {
-        return countryRepository.findAll();
+        try {
+            return new ArrayList<>(cache.get(1L).values());
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     @Override
     public Country getCountry(Long id) {
         try {
-            return cache.get(id);
+            return cache.get(1L).get(id);
         } catch (ExecutionException e) {
             e.printStackTrace();
             return null;

@@ -76,6 +76,7 @@ public class CountryRepository implements ICountryRepository {
     @Override
     @Transactional(readOnly = true)
     public List<Country> findAll() {
+        log.info("Load all countries from base");
         return jdbcTemplate.query("select country_id, title from interest.country",
                 (rs, rowNum) -> new Country(rs.getLong("country_id"), rs.getString("title")));
     }
