@@ -38,6 +38,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/signin").permitAll()
                 .antMatchers(HttpMethod.GET, "/countries/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/users/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/swagger-ui.html/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/countries/**").hasRole("ADMIN")
                 .antMatchers(HttpMethod.GET, "/person/**").hasRole("USER")
                 .antMatchers(HttpMethod.POST, "/person/**").hasRole("USER")
